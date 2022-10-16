@@ -2,7 +2,8 @@ const pokemonContainer = document.querySelector(".pokemon-container");
 const spinner = document.querySelector("#spinner");
 const previous = document.querySelector("#previous");
 const next = document.querySelector("#next");
-
+const especific = document.querySelector("#especifico");
+//variables
 let limit = 8;
 let offset = 1;
 
@@ -22,7 +23,18 @@ next.addEventListener("click", () => {
   offset += 9;
   }
   removechilds();
+});
 
+especific.addEventListener("click", () => {
+  const valorUser = parseInt(prompt("Dame un numero de la pokedex"));
+  if((valorUser >= 908) || (valorUser <= 0)){
+    alert("valor invalido, favor de colocar un nuevo numero")
+    offset = 1;
+  }else{
+  offset = valorUser;
+  console.log(offset);
+  }
+  removechilds();
 });
 
 function fetchPokemon(id) {
@@ -37,6 +49,8 @@ function fetchPokemon(id) {
 function fetchPokemons(offset, limit) {
   spinner.style.display = "block";
   for (let i = offset; i <= offset + limit; i++) {
+    console.log(offset);
+    console.log(offset + limit);
     fetchPokemon(i);
   }
 }
@@ -89,10 +103,10 @@ function createPokemon(pokemon) {
   name.textContent = pokemon.name;
 
 
-  //agrega a la carta empezando por el sprite
-  //luego el numero
-  //luego el nombre
-  //al final el tipo de la pokedex 
+  /*agrega a la carta empezando por el sprite
+  luego el numero
+  luego el nombre
+  al final el tipo de la pokedex */
   card.appendChild(spriteContainer);
   card.appendChild(number);
   card.appendChild(name);
@@ -115,7 +129,7 @@ function createPokemon(pokemon) {
 function progressBars(stats) {
   const statsContainer = document.createElement("div");
   statsContainer.classList.add("stats-container");
-
+// aqui realiza las operaciones  para dar las estadisticas de cada pokemon
   for (let i = 0; i < 3; i++) {
     const stat = stats.stats[i];
 
@@ -175,7 +189,6 @@ function progressBars(stats) {
   else if(numero >= 899 ){
     Region.textContent = 'Region: Hisui';
   }
-  console.log(stats)
   statsContainer.appendChild(Region);
 // -------------------------------------------------------
 
