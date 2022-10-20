@@ -49,8 +49,6 @@ function fetchPokemon(id) {
 function fetchPokemons(offset, limit) {
   spinner.style.display = "block";
   for (let i = offset; i <= offset + limit; i++) {
-    console.log(offset);
-    console.log(offset + limit);
     fetchPokemon(i);
   }
 }
@@ -88,7 +86,7 @@ function createPokemon(pokemon) {
   typeContainer.classList.add("img-container-type"); 
 
 //agrega el tipo del pokemon con imagenes ()
-  for(let i = 0; i < pokemon.types.length ; i++){
+for(let i = 0; i < pokemon.types.length ; i++){
     const typesprite = document.createElement("img");
     typesprite.src = '/types/'+ pokemon.types[i].type.name + '.png ';
     typeContainer.appendChild(typesprite);
