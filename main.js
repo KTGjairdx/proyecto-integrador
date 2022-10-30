@@ -3,36 +3,41 @@ const spinner = document.querySelector("#spinner");
 const previous = document.querySelector("#previous");
 const next = document.querySelector("#next");
 const especific = document.querySelector("#especifico");
+const numeroEspecifico = document.querySelector('#numeropokedex');
 //variables
 let limit = 8;
 let offset = 1;
 
 previous.addEventListener("click", () => {
-if (offset == 1){
-    offset = 898
-}else{
-  offset -= 9
-}
-    removechilds();
+  if (offset == 1) {
+    offset = 898;
+  } else {
+    offset -= 9;
+  }
+  removechilds();
 });
 
 next.addEventListener("click", () => {
-  if(offset >= 898 ){
+  if (offset >= 898) {
     offset = 1;
-  }else{
-  offset += 9;
+  } else {
+    offset += 9;
   }
   removechilds();
 });
 
 especific.addEventListener("click", () => {
-  const valorUser = parseInt(prompt("Dame un numero de la pokedex"));
-  if((valorUser >= 908) || (valorUser <= 0)){
-    alert("valor invalido, favor de colocar un nuevo numero")
+  const valorUser = parseInt(numeroEspecifico.value);
+  console.log(valorUser);
+  if (valorUser >= 908 || valorUser <= 0 || isNaN(valorUser)) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Valor Invalido',
+      text: 'Favor de colocar un nuevo numero!',
+    })
     offset = 1;
-  }else{
-  offset = valorUser;
-  console.log(offset);
+  } else {
+    offset = valorUser;
   }
   removechilds();
 });
@@ -44,6 +49,7 @@ function fetchPokemon(id) {
       createPokemon(data);
       spinner.style.display = "none";
     });
+    cargar();
 }
 
 function fetchPokemons(offset, limit) {
@@ -53,9 +59,33 @@ function fetchPokemons(offset, limit) {
   }
 }
 
-function removechilds(){
-    removeChildNodes(pokemonContainer);
-    fetchPokemons(offset, limit);
+function removechilds() {
+  removeChildNodes(pokemonContainer);
+  fetchPokemons(offset, limit);
+}
+
+function cargar(){
+  let timerInterval
+  Swal.fire({
+    title: 'Cargando',
+    timer: 300,
+    timerProgressBar: true,
+    didOpen: () => {
+      Swal.showLoading()
+      const b = Swal.getHtmlContainer().querySelector('b')
+      timerInterval = setInterval(() => {
+        b.textContent = Swal.getTimerLeft()
+      }, 100)
+    },
+    willClose: () => {
+      clearInterval(timerInterval)
+    }
+  }).then((result) => {
+    /* Read more about handling dismissals below */
+    if (result.dismiss === Swal.DismissReason.timer) {
+      console.log('I was closed by the timer')
+    }
+  })
 }
 
 
@@ -71,7 +101,6 @@ function createPokemon(pokemon) {
   const card = document.createElement("div");
   card.classList.add("pokemon-block");
 
-
   //crea el contenedor y agrega el sprite de los pokemon
   const spriteContainer = document.createElement("div");
   spriteContainer.classList.add("img-container");
@@ -83,23 +112,22 @@ function createPokemon(pokemon) {
 
   //crea el conteiner de la imagen de los typos
   const typeContainer = document.createElement("div");
-  typeContainer.classList.add("img-container-type"); 
+  typeContainer.classList.add("img-container-type");
 
-//agrega el tipo del pokemon con imagenes ()
-for(let i = 0; i < pokemon.types.length ; i++){
+  //agrega el tipo del pokemon con imagenes ()
+  for (let i = 0; i < pokemon.types.length; i++) {
     const typesprite = document.createElement("img");
-    typesprite.src = '/types/'+ pokemon.types[i].type.name + '.png ';
+    typesprite.src = "/types/" + pokemon.types[i].type.name + ".png ";
     typeContainer.appendChild(typesprite);
-    }
+  }
 
-//agrega su numero en la pokedex 
+  //agrega su numero en la pokedex
   const number = document.createElement("p");
   number.textContent = `#${pokemon.id.toString().padStart(3, 0)}`;
-//agrega su nombre en la pokedex
+  //agrega su nombre en la pokedex
   const name = document.createElement("p");
   name.classList.add("name");
   name.textContent = pokemon.name;
-
 
   /*agrega a la carta empezando por el sprite
   luego el numero
@@ -108,8 +136,7 @@ for(let i = 0; i < pokemon.types.length ; i++){
   card.appendChild(spriteContainer);
   card.appendChild(number);
   card.appendChild(name);
-  card.appendChild(typeContainer);  
-
+  card.appendChild(typeContainer);
 
   const cardBack = document.createElement("div");
   cardBack.classList.add("pokemon-block-back");
@@ -119,15 +146,13 @@ for(let i = 0; i < pokemon.types.length ; i++){
   cardContainer.appendChild(card);
   cardContainer.appendChild(cardBack);
   pokemonContainer.appendChild(flipCard);
-
 }
-
 
 //funct que agrega las stadisticas en la parte anterior de la tarjeta
 function progressBars(stats) {
   const statsContainer = document.createElement("div");
   statsContainer.classList.add("stats-container");
-// aqui realiza las operaciones  para dar las estadisticas de cada pokemon
+  // aqui realiza las operaciones  para dar las estadisticas de cada pokemon
   for (let i = 0; i < 3; i++) {
     const stat = stats.stats[i];
 
@@ -161,40 +186,31 @@ function progressBars(stats) {
   const Region = document.createElement("p");
   Region.classList.add("name");
   const numero = parseInt(stats.id);
-  if(numero <= 151){
-    Region.textContent = 'Region: Kanto';
-  }else if(numero >= 152 && numero <= 251 ){
-    Region.textContent = 'Region: Johto';
-  }
-  else if(numero >= 252 && numero <= 386 ){
-    Region.textContent = 'Region: Hoenn';
-  }
-  else if(numero >= 387 && numero <= 493 ){
-    Region.textContent = 'Region: Sinnoh';
-  }
-  else if(numero >= 494 && numero <= 649 ){
-    Region.textContent = 'Region: Teselia';
-  }
-  else if(numero >= 650 && numero <= 721 ){
-    Region.textContent = 'Region: Kalos';
-  }
-  else if(numero >= 722 && numero <= 809 ){
-    Region.textContent = 'Region: Alola';
-  }
-  else if(numero >= 810 && numero <= 898){
-    Region.textContent = 'Region: Galar';
-  }
-  else if(numero >= 899 ){
-    Region.textContent = 'Region: Hisui';
+  if (numero <= 151) {
+    Region.textContent = "Region: Kanto";
+  } else if (numero >= 152 && numero <= 251) {
+    Region.textContent = "Region: Johto";
+  } else if (numero >= 252 && numero <= 386) {
+    Region.textContent = "Region: Hoenn";
+  } else if (numero >= 387 && numero <= 493) {
+    Region.textContent = "Region: Sinnoh";
+  } else if (numero >= 494 && numero <= 649) {
+    Region.textContent = "Region: Teselia";
+  } else if (numero >= 650 && numero <= 721) {
+    Region.textContent = "Region: Kalos";
+  } else if (numero >= 722 && numero <= 809) {
+    Region.textContent = "Region: Alola";
+  } else if (numero >= 810 && numero <= 898) {
+    Region.textContent = "Region: Galar";
+  } else if (numero >= 899) {
+    Region.textContent = "Region: Hisui";
   }
   statsContainer.appendChild(Region);
-// -------------------------------------------------------
-
-
+  // -------------------------------------------------------
 
   return statsContainer;
 }
-//remueve 
+//remueve
 function removeChildNodes(parent) {
   while (parent.firstChild) {
     parent.removeChild(parent.firstChild);
