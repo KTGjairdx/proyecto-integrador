@@ -5,5 +5,8 @@ El proyecto es una pokedex con algo scss js y html que nos da informacion import
 # Instalacion en VSC 
 
 $ git clone git@github.com:KTGjairdx/proyecto-integrador.git
+
 $ npm install
+
 $ npm start
+
