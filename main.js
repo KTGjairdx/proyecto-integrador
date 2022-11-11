@@ -4,6 +4,8 @@ const previous = document.querySelector("#previous");
 const next = document.querySelector("#next");
 const especific = document.querySelector("#especifico");
 const numeroEspecifico = document.querySelector('#numeropokedex');
+const mostrarEquipo = document.querySelector("#equipo");
+const Eliminar = document.querySelector('#eliminarEquipo');
 //variables
 let limit = 8;
 let offset = 1;
@@ -62,6 +64,7 @@ function removechilds() {
   removeChildNodes(pokemonContainer);
   fetchPokemons(offset, limit);
 }
+
 
 
 function createPokemon(pokemon) {
@@ -170,7 +173,6 @@ function progressBars(stats) {
   Add.innerHTML = "Equipo";  
 
   Add.addEventListener("click", () => {
-    console.log(stats.name); 
     agregarEquipo(stats.id); 
   })
   
@@ -228,5 +230,35 @@ function agregarEquipo(pokemon){
   } else{
   equipo.push(pokemon);
   }
-  console.log(equipo);
 }
+
+mostrarEquipo.addEventListener("click", () => { 
+  if(equipo.length == 0){
+  Swal.fire({
+    icon: 'error',
+    title: 'Hey!',
+    text: 'tu equipo esta vacio',
+  })
+  }else{
+    removeChildNodes(pokemonContainer);
+    for (let i = 0; i <= equipo.length ; i++) {
+      fetchPokemon(equipo[i]);
+    }
+  }
+});
+
+Eliminar.addEventListener("click", () => {
+  if(equipo.length == 0){
+  Swal.fire({
+    icon: 'error',
+    title: 'Hey!',
+    text: 'tu equipo esta vacio',
+  })
+  }else{
+    equipo=[];
+    Swal.fire({
+      icon: 'success',
+      text: 'Equipo eliminado con exito',
+    })
+  }
+});
