@@ -7,9 +7,10 @@ const numeroEspecifico = document.querySelector('#numeropokedex');
 //variables
 let limit = 8;
 let offset = 1;
+let equipo = [];
 
 previous.addEventListener("click", () => {
-  if (offset == 1) {
+  if (offset <= 1) {
     offset = 898;
   } else {
     offset -= 9;
@@ -28,7 +29,6 @@ next.addEventListener("click", () => {
 
 especific.addEventListener("click", () => {
   const valorUser = parseInt(numeroEspecifico.value);
-  console.log(valorUser);
   if (valorUser >= 908 || valorUser <= 0 || isNaN(valorUser)) {
     Swal.fire({
       icon: 'error',
@@ -49,7 +49,6 @@ function fetchPokemon(id) {
       createPokemon(data);
       spinner.style.display = "none";
     });
-    cargar();
 }
 
 function fetchPokemons(offset, limit) {
@@ -62,30 +61,6 @@ function fetchPokemons(offset, limit) {
 function removechilds() {
   removeChildNodes(pokemonContainer);
   fetchPokemons(offset, limit);
-}
-
-function cargar(){
-  let timerInterval
-  Swal.fire({
-    title: 'Cargando',
-    timer: 300,
-    timerProgressBar: true,
-    didOpen: () => {
-      Swal.showLoading()
-      const b = Swal.getHtmlContainer().querySelector('b')
-      timerInterval = setInterval(() => {
-        b.textContent = Swal.getTimerLeft()
-      }, 100)
-    },
-    willClose: () => {
-      clearInterval(timerInterval)
-    }
-  }).then((result) => {
-    /* Read more about handling dismissals below */
-    if (result.dismiss === Swal.DismissReason.timer) {
-      console.log('I was closed by the timer')
-    }
-  })
 }
 
 
@@ -186,30 +161,47 @@ function progressBars(stats) {
   const Region = document.createElement("p");
   Region.classList.add("name");
   const numero = parseInt(stats.id);
-  if (numero <= 151) {
-    Region.textContent = "Region: Kanto";
-  } else if (numero >= 152 && numero <= 251) {
-    Region.textContent = "Region: Johto";
-  } else if (numero >= 252 && numero <= 386) {
-    Region.textContent = "Region: Hoenn";
-  } else if (numero >= 387 && numero <= 493) {
-    Region.textContent = "Region: Sinnoh";
-  } else if (numero >= 494 && numero <= 649) {
-    Region.textContent = "Region: Teselia";
-  } else if (numero >= 650 && numero <= 721) {
-    Region.textContent = "Region: Kalos";
-  } else if (numero >= 722 && numero <= 809) {
-    Region.textContent = "Region: Alola";
-  } else if (numero >= 810 && numero <= 898) {
-    Region.textContent = "Region: Galar";
-  } else if (numero >= 899) {
-    Region.textContent = "Region: Hisui";
-  }
+  const regionNombre = addRegion(numero);
+  Region.textContent =  regionNombre;
   statsContainer.appendChild(Region);
   // -------------------------------------------------------
+  const Add = document.createElement("button"); 
+  statsContainer.appendChild(Add);
+  Add.innerHTML = "Equipo";  
 
+  Add.addEventListener("click", () => {
+    console.log(stats.name); 
+    agregarEquipo(stats.id); 
+  })
+  
   return statsContainer;
 }
+
+
+function addRegion(id) {
+  let region = 'Region: '
+  if (id <= 151) {
+    region += "Kanto";
+  } else if (id >= 152 && id <= 251) {
+    region +=  "Johto";
+  } else if (id >= 252 && id <= 386) {
+    region +=  "Hoenn";
+  } else if (id >= 387 && id <= 493) {
+    region += "Sinnoh";
+  } else if (id >= 494 && id <= 649) {  
+    region += "Teselia";
+  } else if (id >= 650 && id <= 721) {
+    region += "Kalos";
+  } else if (id >= 722 && id <= 809) {
+    region += "Alola";
+  } else if (id >= 810 && id <= 898) {
+    region +=  "Galar";
+  } else if (id >= 899) {
+    region += "Hisui";
+  }
+  return region
+}
+
 //remueve
 function removeChildNodes(parent) {
   while (parent.firstChild) {
@@ -218,3 +210,23 @@ function removeChildNodes(parent) {
 }
 
 fetchPokemons(offset, limit);
+
+
+function agregarEquipo(pokemon){
+  if(equipo.includes(pokemon)){
+    Swal.fire({
+      icon: 'error',
+      title: 'Hey!',
+      text: 'Ya esta en el equipo',
+    })
+  }else if(equipo.length >= 6 ){
+    Swal.fire({
+      icon: 'info',
+      title: 'Hey!',
+      text: 'TU equipo esta lleno',
+    })
+  } else{
+  equipo.push(pokemon);
+  }
+  console.log(equipo);
+}
