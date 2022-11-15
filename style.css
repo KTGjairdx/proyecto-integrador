@@ -116,3 +116,31 @@ h1 {
   margin-left: auto;
   margin-right: auto;
 }
+
+.modal-container{
+  position: absolute;
+  top: 50%;
+  left: 35%;
+  width: 25vw;
+  min-height: 25vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;
+  visibility: hidden;
+}
+
+.modal-content {
+  width: 400px;
+  height: auto;
+  padding: 10px;
+  border-radius: 10px;
+  background-color: black;
+  text-align: center;
+}
+
+.modal-content h1 {
+font-size: 25px;
+font-weight: 500;
+color: #000;
+}

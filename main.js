@@ -6,10 +6,19 @@ const especific = document.querySelector("#especifico");
 const numeroEspecifico = document.querySelector('#numeropokedex');
 const mostrarEquipo = document.querySelector("#equipo");
 const Eliminar = document.querySelector('#eliminarEquipo');
-//variables
+const Inicio = document.querySelector('#Inicio');
+const modalEquipo = document.querySelector('#modal');
+const CerrarModal = document.querySelector('#close');
+const debilidadescontainer = document.querySelector(".debilidades");
+//variables globales
 let limit = 8;
 let offset = 1;
 let equipo = [];
+let yaEnEquipo = false;
+
+
+//realiza el primer despliegue de pokemons 
+fetchPokemons(offset, limit);
 
 previous.addEventListener("click", () => {
   if (offset <= 1) {
@@ -49,7 +58,7 @@ function fetchPokemon(id) {
     .then((res) => res.json())
     .then((data) => {
       createPokemon(data);
-      spinner.style.display = "none";
+     spinner.style.display = "none";
     });
 }
 
@@ -64,7 +73,6 @@ function removechilds() {
   removeChildNodes(pokemonContainer);
   fetchPokemons(offset, limit);
 }
-
 
 
 function createPokemon(pokemon) {
@@ -89,15 +97,11 @@ function createPokemon(pokemon) {
   spriteContainer.appendChild(sprite);
 
   //crea el conteiner de la imagen de los typos
-  const typeContainer = document.createElement("div");
-  typeContainer.classList.add("img-container-type");
+ // const typeContainer = document.createElement("div");
+  //typeContainer.classList.add("img-container-type");
 
   //agrega el tipo del pokemon con imagenes ()
-  for (let i = 0; i < pokemon.types.length; i++) {
-    const typesprite = document.createElement("img");
-    typesprite.src = "/types/" + pokemon.types[i].type.name + ".png ";
-    typeContainer.appendChild(typesprite);
-  }
+
 
   //agrega su numero en la pokedex
   const number = document.createElement("p");
@@ -114,7 +118,11 @@ function createPokemon(pokemon) {
   card.appendChild(spriteContainer);
   card.appendChild(number);
   card.appendChild(name);
-  card.appendChild(typeContainer);
+  let tipo =[]
+  for (let i = 0; i < pokemon.types.length; i++) {
+    tipo.push(pokemon.types[i].type.name);
+  }
+  agregar(card,tipo);
 
   const cardBack = document.createElement("div");
   cardBack.classList.add("pokemon-block-back");
@@ -163,23 +171,39 @@ function progressBars(stats) {
   // coloca la region del pokemon
   const Region = document.createElement("p");
   Region.classList.add("name");
-  const numero = parseInt(stats.id);
-  const regionNombre = addRegion(numero);
-  Region.textContent =  regionNombre;
+  Region.textContent =  addRegion(parseInt(stats.id));
   statsContainer.appendChild(Region);
-  // -------------------------------------------------------
-  const Add = document.createElement("button"); 
-  statsContainer.appendChild(Add);
-  Add.innerHTML = "Equipo";  
 
-  Add.addEventListener("click", () => {
-    agregarEquipo(stats.id); 
-  })
+  ///aqui crear que si ya esta en el equipo en luigar de ser agregar sea eliminar :d 
+  for (let x of equipo){
+    if(x.id==stats.id){
+       yaEnEquipo =true
+    }
+  }
+
+  if(yaEnEquipo==true){
+    const remove = document.createElement("button"); 
+    statsContainer.appendChild(remove);
+    remove.innerHTML = "Remover de equipo";
+    remove.style.background='#990000';  
+    remove.style.color='#FFFFFF';
+    remove.addEventListener("click", () => {
+      EliminarPokemon(stats); 
+    })
+    yaEnEquipo=false;
+  }else{
+    const Add = document.createElement("button"); 
+    statsContainer.appendChild(Add);
+    Add.innerHTML = "Equipo";  
+    Add.addEventListener("click", () => {
+      agregarEquipo(stats); 
+    })
+  }
   
   return statsContainer;
 }
 
-
+//funcion que determinado el id del pokemon agrega la region a la que permanece
 function addRegion(id) {
   let region = 'Region: '
   if (id <= 151) {
@@ -210,18 +234,9 @@ function removeChildNodes(parent) {
     parent.removeChild(parent.firstChild);
   }
 }
-
-fetchPokemons(offset, limit);
-
-
+//revisar por que no jala la validacion solamente
 function agregarEquipo(pokemon){
-  if(equipo.includes(pokemon)){
-    Swal.fire({
-      icon: 'error',
-      title: 'Hey!',
-      text: 'Ya esta en el equipo',
-    })
-  }else if(equipo.length >= 6 ){
+if(equipo.length >= 6 ){
     Swal.fire({
       icon: 'info',
       title: 'Hey!',
@@ -230,6 +245,12 @@ function agregarEquipo(pokemon){
   } else{
   equipo.push(pokemon);
   }
+  removechilds();
+}
+
+function EliminarPokemon(pokemon){
+  equipo.pop(pokemon.id);
+  removechilds();
 }
 
 mostrarEquipo.addEventListener("click", () => { 
@@ -240,15 +261,24 @@ mostrarEquipo.addEventListener("click", () => {
     text: 'tu equipo esta vacio',
   })
   }else{
+    modalEquipo.style.visibility = "visible";
     removeChildNodes(pokemonContainer);
-    for (let i = 0; i <= equipo.length ; i++) {
-      fetchPokemon(equipo[i]);
+    removeChildNodes(debilidadescontainer);
+    let debilidadestipo = [];
+    for (let i = 0; i < equipo.length ; i++) {
+      fetchPokemon(equipo[i].id);
+      for (let y = 0; y < equipo[i].types.length; y++) {
+      const tipo = equipo[i].types[y].type.name;
+      const respuesta = debilidad(tipo);
+      debilidadestipo = debilidadestipo.concat(respuesta);
+      }
     }
+    agregar(debilidadescontainer,debilidadestipo);
   }
 });
 
 Eliminar.addEventListener("click", () => {
-  if(equipo.length == 0){
+  if(equipo.length == 0){ 
   Swal.fire({
     icon: 'error',
     title: 'Hey!',
@@ -260,5 +290,85 @@ Eliminar.addEventListener("click", () => {
       icon: 'success',
       text: 'Equipo eliminado con exito',
     })
+    removechilds();
   }
 });
+
+CerrarModal.addEventListener("click", () => {
+  modalEquipo.style.visibility = "hidden";
+});
+
+function debilidad(tipo){
+  let grupoDebilidades=[];
+  switch (tipo) {
+    case 'grass':
+      grupoDebilidades = ['bug','fire','ice','poison','flying'];
+      break;
+    case 'fire':
+      grupoDebilidades = ['water','rock','ground'];
+    break;
+    case 'water':
+      grupoDebilidades = ['electric','grass'];
+    break;
+    case 'steel':
+      grupoDebilidades = ['fire','fighting','ground'];
+    break;
+    case 'bug':
+      grupoDebilidades = ['fire','rock','flying'];
+    break;
+    case 'dragon':
+      grupoDebilidades = ['dragon','fairy','ice'];
+    break;
+    case 'electric':
+      grupoDebilidades = ['ground'];
+    break;
+    case 'ghost':
+      grupoDebilidades = ['dark'];
+    break;
+    case 'fairy':
+      grupoDebilidades = ['steel','poison'];
+    break;
+    case 'ice':
+      grupoDebilidades = ['steel','fire','fighting','rock'];
+    break;
+    case 'fighting':
+      grupoDebilidades = ['fairy','psychic','flying'];
+    break;
+    case 'normal':
+      grupoDebilidades = ['fighting'];
+    break;
+    case 'psychic':
+      grupoDebilidades = ['bug','ghost','dark'];
+    break;
+    case 'rock':
+      grupoDebilidades = ['steel','water','fighting','grass','ground'];
+    break;
+    case 'dark':
+      grupoDebilidades = ['bug','fairy','fighting'];
+    break;
+    case 'dark':
+      grupoDebilidades = ['bug','fairy','fighting'];
+    break;
+    case 'ground':
+      grupoDebilidades = ['water','ice','grass'];
+    break;
+    case 'poison':
+      grupoDebilidades = ['psychic','ground'];
+    break;
+    case 'flying':
+      grupoDebilidades = ['electric','ice','rock'];
+    break;
+  }
+  return grupoDebilidades;
+}
+
+function agregar(contendor,respuesta){
+  const typeContainer = document.createElement("div");
+  typeContainer.classList.add("img-container-type");
+  for(let x = 0;x<respuesta.length;x++){
+    const typesprite = document.createElement("img");
+    typesprite.src = "/types/" + respuesta[x] + ".png ";
+    typeContainer.appendChild(typesprite);
+  }
+  contendor.appendChild(typeContainer);
+}
