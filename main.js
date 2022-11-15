@@ -199,7 +199,6 @@ function progressBars(stats) {
       agregarEquipo(stats); 
     })
   }
-  
   return statsContainer;
 }
 
@@ -249,7 +248,9 @@ if(equipo.length >= 6 ){
 }
 
 function EliminarPokemon(pokemon){
-  equipo.pop(pokemon.id);
+  modalEquipo.style.visibility = "hidden";
+  const arr =  equipo.filter(id => id.id != pokemon.id );
+  equipo = arr
   removechilds();
 }
 
@@ -273,7 +274,9 @@ mostrarEquipo.addEventListener("click", () => {
       debilidadestipo = debilidadestipo.concat(respuesta);
       }
     }
-    agregar(debilidadescontainer,debilidadestipo);
+    const debilidadesEquipo= new Set(debilidadestipo);
+    let result =[... debilidadesEquipo]
+    agregar(debilidadescontainer,result);
   }
 });
 
@@ -286,6 +289,7 @@ Eliminar.addEventListener("click", () => {
   })
   }else{
     equipo=[];
+    modalEquipo.style.visibility = "hidden";
     Swal.fire({
       icon: 'success',
       text: 'Equipo eliminado con exito',
