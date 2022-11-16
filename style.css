@@ -103,6 +103,7 @@ h1 {
 .flex2 { 
   display: flex; 
   justify-content: space-around; 
+  object-position: right;
 } 
 
 .Dpagination {
@@ -119,8 +120,8 @@ h1 {
 
 .modal-container{
   position: absolute;
-  top: 50%;
-  left: 35%;
+  top: 70%;
+  left: 38%;
   width: 25vw;
   min-height: 25vh;
   display: flex;

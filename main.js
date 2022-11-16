@@ -10,6 +10,7 @@ const Inicio = document.querySelector('#Inicio');
 const modalEquipo = document.querySelector('#modal');
 const CerrarModal = document.querySelector('#close');
 const debilidadescontainer = document.querySelector(".debilidades");
+const fortalezacontainer = document.querySelector(".Fortalezas");
 //variables globales
 let limit = 8;
 let offset = 1;
@@ -26,6 +27,7 @@ previous.addEventListener("click", () => {
   } else {
     offset -= 9;
   }
+  modalEquipo.style.visibility = "hidden";
   removechilds();
 });
 
@@ -35,6 +37,7 @@ next.addEventListener("click", () => {
   } else {
     offset += 9;
   }
+  modalEquipo.style.visibility = "hidden";
   removechilds();
 });
 
@@ -265,18 +268,26 @@ mostrarEquipo.addEventListener("click", () => {
     modalEquipo.style.visibility = "visible";
     removeChildNodes(pokemonContainer);
     removeChildNodes(debilidadescontainer);
+    removeChildNodes(fortalezacontainer);
     let debilidadestipo = [];
+    let fortalezatipo = [];
     for (let i = 0; i < equipo.length ; i++) {
       fetchPokemon(equipo[i].id);
       for (let y = 0; y < equipo[i].types.length; y++) {
       const tipo = equipo[i].types[y].type.name;
-      const respuesta = debilidad(tipo);
-      debilidadestipo = debilidadestipo.concat(respuesta);
+      const respuestaD = debilidad(tipo);
+      const respuestaF = fortalezas(tipo);
+      debilidadestipo = debilidadestipo.concat(respuestaD);
+      fortalezatipo = fortalezatipo.concat(respuestaF)
       }
     }
     const debilidadesEquipo= new Set(debilidadestipo);
-    let result =[... debilidadesEquipo]
-    agregar(debilidadescontainer,result);
+    let resultD =[... debilidadesEquipo]
+    agregar(debilidadescontainer,resultD);
+    const fortalezaEquipo= new Set(fortalezatipo);
+    let resultF =[... fortalezaEquipo]
+    agregar(fortalezacontainer,resultF);
+
   }
 });
 
@@ -350,9 +361,6 @@ function debilidad(tipo){
     case 'dark':
       grupoDebilidades = ['bug','fairy','fighting'];
     break;
-    case 'dark':
-      grupoDebilidades = ['bug','fairy','fighting'];
-    break;
     case 'ground':
       grupoDebilidades = ['water','ice','grass'];
     break;
@@ -372,7 +380,69 @@ function agregar(contendor,respuesta){
   for(let x = 0;x<respuesta.length;x++){
     const typesprite = document.createElement("img");
     typesprite.src = "/types/" + respuesta[x] + ".png ";
+    typesprite.title = respuesta[x] + ' type';
     typeContainer.appendChild(typesprite);
   }
   contendor.appendChild(typeContainer);
+}
+
+function fortalezas(tipo){
+  let grupoFortalezas=[];
+  switch (tipo) {
+    case 'grass':
+      grupoFortalezas = ['water','rock','ground'];
+      break;
+    case 'fire':
+      grupoFortalezas = ['steel','bug','ice','grass'];
+    break;
+    case 'water':
+      grupoFortalezas = ['fire','rock','ground'];
+    break;
+    case 'steel':
+      grupoFortalezas = ['fairy','ice','rock'];
+    break;
+    case 'bug':
+      grupoFortalezas = ['grass','psychic','dark'];
+    break;
+    case 'dragon':
+      grupoFortalezas = ['dragon'];
+    break;
+    case 'electric':
+      grupoFortalezas = ['water','flying'];
+    break;
+    case 'ghost':
+      grupoFortalezas = ['ghost','psychic'];
+    break;
+    case 'fairy':
+      grupoFortalezas = ['dragon','fighting','dark'];
+    break;
+    case 'ice':
+      grupoFortalezas = ['dragon','grass','ground','flying'];
+    break;
+    case 'fighting':
+      grupoFortalezas = ['steel','ice','normal','rock','dark'];
+    break;
+    case 'normal':
+      grupoFortalezas = [];
+    break;
+    case 'psychic':
+      grupoFortalezas = ['fighting','poison'];
+    break;
+    case 'rock':
+      grupoFortalezas = ['bug','fire','ice','flying'];
+    break;
+    case 'dark':
+      grupoFortalezas = ['ghost','psychic'];
+    break;
+    case 'ground':
+      grupoFortalezas = ['steel','electric','fairy','rock','posion'];
+    break;
+    case 'poison':
+      grupoFortalezas = ['fairy','grass'];
+    break;
+    case 'flying':
+      grupoFortalezas = ['bug','fighting','psychic'];
+    break;
+  }
+  return grupoFortalezas;
 }
